@@ -20,7 +20,7 @@ async function main(){
     const producer=kafka.producer();
     await producer.connect();
 
-    await consumer.subscribe({topic:TOPIC_NAME,fromBeginning:true});
+    await consumer.subscribe({topic:"zap-events",fromBeginning:true});
 
     await consumer.run({
         autoCommit:false,
