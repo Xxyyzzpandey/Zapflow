@@ -5,10 +5,12 @@ const app=express();
 
 const client=new PrismaClient();
 
+app.use(express.json());
+
 //https://hooks.zapier.com/hooks/catch/223345/848489/
 //pasword logic
 
-app.post("hooks/catch/:userId/:zapId", async(req,res)=>{
+app.post("/hooks/catch/:userId/:zapId", async(req,res)=>{
     const userId=req.params.userId;
     const zapId=req.params.zapId;
     const body =req.body
@@ -32,3 +34,6 @@ app.post("hooks/catch/:userId/:zapId", async(req,res)=>{
 
 
 app.listen(3002,()=>{console.log("server is running at port 3002...")})
+
+
+
