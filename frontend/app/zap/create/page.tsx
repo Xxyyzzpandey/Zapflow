@@ -261,16 +261,16 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
 function EmailSelector({setMetadata}: {
     setMetadata: (params: any) => void;
 }) {
-    const [email, setEmail] = useState("");
+    const [to, setTo] = useState("");
     const [body, setBody] = useState("");
 
     return <div>
-        <Input label={"To"} type={"text"} placeholder="To" onChange={(e) => setEmail(e.target.value)}></Input>
+        <Input label={"To"} type={"text"} placeholder="To" onChange={(e) => setTo(e.target.value)}></Input>
         <Input label={"Body"} type={"text"} placeholder="Body" onChange={(e) => setBody(e.target.value)}></Input>
         <div className="pt-2">
             <PrimaryButton onClick={() => {
                 setMetadata({
-                    email,
+                    to,
                     body
                 })
             }}>Submit</PrimaryButton>
