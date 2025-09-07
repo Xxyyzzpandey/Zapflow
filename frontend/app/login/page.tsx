@@ -25,7 +25,7 @@ export default function LoginPage() {
         password,
       });
       localStorage.setItem("token", res.data.token);
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: any) {
       console.error("Login failed:", err.response?.data || err.message);
       setError(err.response?.data?.message || "Invalid email or password");
