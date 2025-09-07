@@ -6,6 +6,16 @@ import { SecondaryButton } from "./buttons/SecondaryButton"
 
 export const Hero = () => {
     const router = useRouter();
+
+    const handleGetstarted=async()=>{
+        const token= localStorage.getItem("token");
+        if(!token){
+            router.push("/signup")
+        }else{
+            router.push("/zap/create")
+        }
+    }
+
     return <div>
         <div className="flex justify-center">
             <div className="text-5xl font-bold font-semibold text-center pt-8 max-w-xl">
@@ -20,11 +30,11 @@ export const Hero = () => {
 
         <div className="flex justify-center pt-4">
             <div className="flex">
-                <PrimaryButton onClick={() => {
-                    router.push("/signup")
-                }} size="big">Get Started free</PrimaryButton>
+                <PrimaryButton onClick={handleGetstarted} size="big">Get Started free</PrimaryButton>
                 <div className="pl-4">
-                    <SecondaryButton  onClick={() => {}} size="big">Contact Sales</SecondaryButton>
+                    <SecondaryButton  onClick={
+                        () => {router.push("/prising")}
+                        } size="big">Contact Sales</SecondaryButton>
                 </div>
             </div>
         </div>
