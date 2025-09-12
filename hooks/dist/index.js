@@ -16,17 +16,15 @@ const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
 const app = (0, express_1.default)();
 const client = new client_1.PrismaClient();
+app.use(express_1.default.json());
 //https://hooks.zapier.com/hooks/catch/223345/848489/
-//pasword logic
-app.post("hooks/catch/:userId/:zapId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.userId;
-    const zapId = req.params.zapId;
+app.post("/hooks/catch/:userId/:zapId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, zapId } = req.params;
     const body = req.body;
-    //store in db a new trigger
     yield client.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const run = yield tx.zapRun.create({
             data: {
-                zapId: zapId,
+                zapId,
                 metadata: body
             }
         });
@@ -35,6 +33,9 @@ app.post("hooks/catch/:userId/:zapId", (req, res) => __awaiter(void 0, void 0, v
                 zapRunId: run.id
             }
         });
-    }));
+    }), { timeout: 10000,
+        maxWait: 5000
+    });
+    res.json({ success: true, zapId, userId, received: body });
 }));
 app.listen(3002, () => { console.log("server is running at port 3002..."); });
