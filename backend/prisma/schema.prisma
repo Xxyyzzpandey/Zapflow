@@ -39,7 +39,9 @@ model Trigger {
   metadata    Json  @default("{}")
   type  AvailableTrigger @relation(fields: [triggerId], references: [id])
   zap  Zap                @relation(fields: [zapId], references: [id])
+  processing  Boolean @default(false)
 }
+
 
 model Action {
   id        String  @id @default(uuid())
