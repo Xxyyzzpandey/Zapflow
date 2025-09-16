@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "dev": "ts-node-dev src/index.ts",
-  "build": "tsc",
-  "start": "node dist/index.js",
-  "prestart": "npm run build"
-}
-,
+    "dev": "ts-node-dev src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prestart": "npm run build"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -16,7 +15,8 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.7.0",
-    "@types/express": "^5.0.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.0",
     "express": "^5.1.0",
     "prisma": "^6.7.0"
   }
