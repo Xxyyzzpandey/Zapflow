@@ -54,7 +54,8 @@ parsedData.data.actions.forEach((a, i) => {
   const trigger = await tx.trigger.create({
   data: {
     zapId: zap.id,
-    triggerId: parsedData.data.availableTriggerId, // must exist in AvailableTrigger
+    triggerId: parsedData.data.availableTriggerId,
+    metadata: parsedData.data.triggerMetadata as Prisma.JsonObject, // must exist in AvailableTrigger
   },
 });
 
@@ -117,11 +118,11 @@ router.get("/:zapId", authMiddleware, async (req, res) => {
   const zap = await prismaClient.zap.findUnique({
     where: {
       id: zapId,
-      userId: userId,   // ✅ ensures user owns this zap
+      userId: userId,   
     },
     include: {
       actions: {
-        orderBy: { sortingOrder: "asc" }, // nice to keep order
+        orderBy: { sortingOrder: "asc" }, 
         include: { type: true },
       },
       trigger: {
@@ -135,6 +136,107 @@ router.get("/:zapId", authMiddleware, async (req, res) => {
   }
 
   return res.json({ zap });
+});
+
+
+//@ts-ignore
+router.delete("/action/:actionId", authMiddleware, async (req, res) => {
+  const actionId = req.params.actionId;
+  //@ts-ignore
+  const userId = req.id;
+
+  try {
+    // Ensure the action belongs to the user's zap
+    const action = await prismaClient.action.findFirst({
+      where: {
+        id: actionId,
+        zap: {
+          userId: userId,
+        },
+      },
+    });
+
+    if (!action) {
+      return res.status(404).json({ error: "Action not found or access denied" });
+    }
+
+    // Start transaction for atomicity
+    await prismaClient.$transaction(async (tx) => {
+
+  await tx.action.delete({
+    where: { id: actionId },
+  });
+
+  
+  const remainingActions = await tx.action.findMany({
+    where: { zapId: action.zapId },
+  });
+
+  if (remainingActions.length === 0) {
+    
+    await tx.zapRun.deleteMany({
+      where: { zapId: action.zapId },
+    });
+
+    
+    await tx.trigger.delete({
+      where: { zapId: action.zapId },
+    });
+
+    
+    await tx.zap.delete({
+      where: { id: action.zapId },
+    });
+  }
+});
+
+    return res.json({
+      message:
+        "action deleted successfully",
+    });
+  } catch (err) {
+    console.error("Failed to delete action:", err);
+    return res.status(500).json({ message: "Failed to delete action" });
+  }
+});
+
+
+//@ts-ignore
+router.put("/action/:actionId", authMiddleware, async (req, res) => {
+  const actionId = req.params.actionId;
+  const { metadata } = req.body; 
+  //@ts-ignore
+  const userId = req.id;
+
+  if (typeof metadata !== "object") {
+    return res.status(400).json({ error: "Invalid metadata format" });
+  }
+
+  try {
+    // Ensure the action belongs to the user's zap
+    const action = await prismaClient.action.findFirst({
+      where: {
+        id: actionId,
+        zap: {
+          userId: userId,
+        },
+      },
+    });
+
+    if (!action) {
+      return res.status(404).json({ error: "Action not found" });
+    }
+
+    await prismaClient.action.update({
+      where: { id: actionId },
+      data: { metadata: metadata as Prisma.JsonObject },
+    });
+
+    return res.json({ message: "action updated successfully" });
+  } catch (err) {
+    console.error("Failed to update action:", err);
+    return res.status(500).json({ message: "Failed to update action" });
+  }
 });
 
 
